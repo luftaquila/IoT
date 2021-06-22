@@ -78,7 +78,7 @@ void setup() {
   Serial.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
 
   // server address, port and URL
-  socketIO.begin("192.168.0.20", 3150, "/socket.io/?EIO=4&device=lightSwitch0&deviceType=passiveSwitch");
+  socketIO.begin("iot.luftaquila.io", 3150, "/socket.io/?EIO=4&device=lightSwitch0&deviceType=passiveSwitch");
 
   // event handler
   socketIO.onEvent(socketIOEvent);
