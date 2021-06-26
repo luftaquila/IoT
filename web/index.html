@@ -72,11 +72,11 @@
               <div class="row" style="align-items: center">
                 <div class="col-6 col-lg-3 col-md-6">
                   <div class="card">
-                    <label class="form-check-label" for="computerRoomSwitch">
+                    <label class="form-check-label" for="lightSwitch0">
                       <div class="card-body px-3 py-3">
                         <div class="row" style="align-items: center">
                           <div class="col-md-4">
-                            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="computerRoomSwitch"></div>
+                            <div class="form-check form-switch"><input class="form-check-input control-passive-switch" type="checkbox" id="lightSwitch0" disabled></div>
                           </div>
                           <div class="col-md-8 switch-card">Computer Room</div>
                         </div>
@@ -86,11 +86,11 @@
                 </div>
                 <div class="col-6 col-lg-3 col-md-6">
                   <div class="card">
-                    <label class="form-check-label" for="bedRoomSwitch">
+                    <label class="form-check-label" for="lightSwitch1">
                       <div class="card-body px-3 py-3">
                         <div class="row" style="align-items: center">
                           <div class="col-md-4">
-                            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="bedRoomSwitch"></div>
+                            <div class="form-check form-switch"><input class="form-check-input control-passive-switch" type="checkbox" id="lightSwitch1" disabled></div>
                           </div>
                           <div class="col-md-8 switch-card">Bed Room</div>
                         </div>
@@ -123,11 +123,13 @@
     </div>
     <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
-
+    <!--
     <script src="assets/vendors/apexcharts/apexcharts.js"></script>
     <script src="assets/js/pages/dashboard.js"></script>
+    -->
     <script src="assets/js/main.js"></script>
-    <script src="https://iot.luftaquila.io:3150/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="assets/js/script.js"></script>
 </body>
 

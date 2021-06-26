@@ -25,11 +25,12 @@ class PassiveSwitch extends Device {
 
   get type() { return this._type; }
   get power() { return this._power; }
-  set power(power) { this._power = power; }
+  setPower(power) { this._power = power; }
 
   toggle() { this._power = !this._power; }
   sync() {
-    io.to(this._socket).emit('relay', { data: this._status.power ? '1' : '0' });
+    io.to(this._socket).emit('relay', { data: this._power ? '1' : '0' });
+    io.to('client').emit('control-device-sync', { target: this.id, data: this._power });
   }
 }
 
@@ -40,4 +41,4 @@ const DeviceType = {
 }
 
 export default devices
-export { Device, PassiveSwitch, DeviceType }
+export { PassiveSwitch, DeviceType }
