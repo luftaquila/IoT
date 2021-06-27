@@ -1,11 +1,13 @@
 import { Server } from 'socket.io'
-import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
 
 import devices from '../devices/device.js'
 import { PassiveSwitch } from '../devices/device.js'
 
-const io = new Server(3150);
-console.log(`[SOCKET][INFO] Server startup.`);
+dotenv.config();
+
+const io = new Server(process.env.socketPort);
+console.log(`[SOCKET][INFO] Server startup :${process.env.socketPort}`);
 
 io.sockets.on('connection', socket => {
   if(socket.handshake.query.device) {
@@ -30,7 +32,7 @@ io.sockets.on('connection', socket => {
     socket.emit('client-init', devices);
     console.log(`[SOCKET][INFO] Client connected: ${socket.handshake.headers['x-forwarded-for']}`);
   }
-  
+
   //!--------------------------- socket events -------------------------------
   socket.on('control-device', data => {
     const device = devices.find(device => device.id == data.target);

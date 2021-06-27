@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="assets/css/bootstrap.css">
 
   <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+  <link rel="stylesheet" href="assets/vendors/toastify/toastify.css">
 
   <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
   <link rel="stylesheet" href="assets/vendors/fontawesome/css/all.min.css">
@@ -22,7 +23,7 @@
 
 <body>
     <div id="app">
-      <div id="sidebar" class="active">
+      <div id="sidebar" class="">
         <div class="sidebar-wrapper active">
           <div class="sidebar-header">
             <div class="d-flex justify-content-between">
@@ -51,6 +52,10 @@
                   <span>Server</span>
                 </a>
               </li>
+              <div style='margin-top: 1rem; text-align: center'>
+                <button id="login" style="display: none;" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#login-form">로그인</button>
+                <button id="logout" style="display: none;" type="button" class="btn btn-warning">로그아웃</button>
+              </div>
             </ul>
           </div>
           <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
@@ -104,11 +109,34 @@
         </div>
 
         <div class="page-heading">
-            <h3>Dashboard</h3>
+          <h3>Dashboard</h3>
         </div>
         <div class="page-content">
 
         </div>
+        <div class='modals'>
+          <div class="modal modal-borderless fade text-left show" id="login-form" tabindex="-1" aria-labelledby="login-modal" style="display: none; padding-right: 17px;" aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"><h4 class="modal-title" id="login-modal">로그인</h4></div>
+                    <form action="#">
+                      <div class="modal-body" style="padding-bottom: 0px;">
+                        <div class="form-group"><input id='id' type="text" placeholder="아이디" class="form-control"></div>
+                        <div class="form-group"><input id='pw' type="password" placeholder="비밀번호" class="form-control"></div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">닫기</button>
+                        <button id='login-proceed' type="button" class="btn btn-success ml-1">로그인</button>
+                      </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="toast" role="alert" aria-live="polite" aria-atomic="true" data-delay="10000">
+        <div role="alert" aria-live="assertive" aria-atomic="true">...</div>
+      </div>
 
         <footer>
           <div class="footer clearfix mb-0 text-muted">
@@ -123,14 +151,20 @@
     </div>
     <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendors/toastify/toastify.js"></script>
+    <script src="assets/vendors/on-change/index.js"></script>
     <!--
     <script src="assets/vendors/apexcharts/apexcharts.js"></script>
     <script src="assets/js/pages/dashboard.js"></script>
     -->
     <script src="assets/js/main.js"></script>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="assets/js/js.cookie.min.js"></script>
+
     <script src="assets/js/script.js"></script>
+    <script>socketListener()</script>
 </body>
 
 </html>
