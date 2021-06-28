@@ -1,3 +1,17 @@
+const access = {
+  _login: false,
+  _socket: false,
+  check() { return this._login && this._socket; },
+  set login(status) {
+    this._login = status;
+    $('.control-passive-switch').attr('disabled', !this.check());
+   },
+  set socket(status) {
+    this._socket = status;
+    $('.control-passive-switch').attr('disabled', !this.check());
+   }
+}
+
 $(autoLoginProcess);
 
 function autoLoginProcess() {
@@ -6,6 +20,7 @@ function autoLoginProcess() {
     $('#login').css('display', 'inline-block');
     $('#logout').css('display', 'none');
     $('#sidebar').addClass('active');
+    access.login = false;
   }
   else {
     $.ajax({
@@ -15,11 +30,13 @@ function autoLoginProcess() {
       success: res => {
         $('#login').css('display', 'none');
         $('#logout').css('display', 'inline-block');
+        access.login = true;
       },
       error: () => {
         $('#login').css('display', 'inline-block');
         $('#logout').css('display', 'none');
         $('#sidebar').addClass('active');
+        access.login = false;
       }
     });
   }
@@ -29,19 +46,20 @@ function socketListener() {
   socket = io({ query: { client: true } });
   socket.on('client-init', devices => {
     devices.forEach(device => $(`#${device._id}`).prop('checked', device._power) );
-    $('.control-passive-switch').attr('disabled', false);
+    access.socket = true;
     eventListener();
   });
 
   socket.on('control-device-sync', data => $(`#${data.target}`).prop('checked', data.data) );
-  socket.on('disconnect', () => $('.control-passive-switch').attr('disabled', true) );
+  socket.on('disconnect', () => access.socket = false );
 }
 
 function eventListener() {
   $('.control-passive-switch').change(function() {
     socket.emit('control-device', {
       target: $(this).attr('id'),
-      power: $(this).prop('checked')
+      power: $(this).prop('checked'),
+      jwt: Cookies.get('JWT')
     });
   });
 }
@@ -68,6 +86,7 @@ $('#login-proceed').click(() => {
       $('#login').css('display', 'none');
       $('#logout').css('display', 'inline-block');
       Cookies.set('JWT', res, { expires: 365 });
+      access.login = true;
     },
     error: () => Toastify({
       text: "아이디 또는 비밀번호를 확인하세요&ensp;",
@@ -84,4 +103,5 @@ $('#logout').click(() => {
   Cookies.remove('JWT');
   $('#login').css('display', 'inline-block');
   $('#logout').css('display', 'none');
+  access.login = false;
 });

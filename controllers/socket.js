@@ -1,8 +1,8 @@
 import { Server } from 'socket.io'
 import dotenv from 'dotenv'
 
-import devices from '../devices/device.js'
-import { PassiveSwitch } from '../devices/device.js'
+import Auth from './auth.js'
+import devices, { PassiveSwitch } from '../devices/device.js'
 
 dotenv.config();
 
@@ -35,9 +35,10 @@ io.sockets.on('connection', socket => {
 
   //!--------------------------- socket events -------------------------------
   socket.on('control-device', data => {
+    const auth = Auth.verify(data.jwt);
     const device = devices.find(device => device.id == data.target);
-    if(device) {
-      device.setPower(data.power);
+    if(auth && device) {
+      device.power = data.power;
       device.sync();
       console.log(`[SOCKET][EVENT] Device control: ${device.id} from: ${socket.handshake.headers['x-forwarded-for']}`);
     }

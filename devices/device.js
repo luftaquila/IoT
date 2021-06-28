@@ -20,12 +20,12 @@ class PassiveSwitch extends Device {
 
     // initialize power status
     this._power = false;
-    io.to(this._socket).emit('relay', { data: '0' });
+    this.sync();
   }
 
   get type() { return this._type; }
   get power() { return this._power; }
-  setPower(power) { this._power = power; }
+  set power(power) { this._power = power; }
 
   toggle() { this._power = !this._power; }
   sync() {

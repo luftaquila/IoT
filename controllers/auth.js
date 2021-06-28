@@ -24,7 +24,7 @@ class AuthClient {
     else return false;
   }
 
-  autologin(token) {
+  verify(token) {
     let flag;
     jwt.verify(token, process.env.JWTsecret, (err, decoded) => {
       if(err) flag = false;
