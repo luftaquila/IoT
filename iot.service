@@ -1,0 +1,13 @@
+[Unit]
+Description=IoT Home Backend Server
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/luftaquila/HDD/iot
+ExecStart=/usr/local/bin/npx babel-node index.js
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
