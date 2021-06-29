@@ -8,6 +8,7 @@ const access = {
    },
   set socket(status) {
     this._socket = status;
+    $('#socket').css('background-color', this._socket ? 'green' : '');
     $('.control-passive-switch').attr('disabled', !this.check());
    }
 }
