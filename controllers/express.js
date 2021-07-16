@@ -21,7 +21,7 @@ app.post('/login', (req, res) => {
   const login_result = Auth.login(req.body.id, req.body.pw);
   if(login_result) {
     res.status(201).send(login_result);
-    console.log(`[WEBAPI][EVENT] Client login: ${req.remoteIP}`);
+    console.log(`[WEBAPI][EVENT] Client login: ${req.body.id}(${req.remoteIP})`);
   }
   else {
     res.status(401).send();
@@ -33,7 +33,7 @@ app.post('/autologin', (req, res) => {
   const login_result = Auth.verify(req.header('jwt'));
   if(login_result) {
     res.status(201).send(login_result);
-    console.log(`[WEBAPI][EVENT] Client autologin: ${req.remoteIP}`);
+    console.log(`[WEBAPI][EVENT] Client autologin: ${login_result.id}(${req.remoteIP})`);
   }
   else {
     res.status(401).send();
