@@ -27,7 +27,7 @@ function autoLoginProcess() {
     $.ajax({
       url: 'api/autologin',
       type: 'POST',
-      data: { jwt: JWT },
+      beforeSend: xhr => xhr.setRequestHeader('jwt', Cookies.get('JWT')),
       success: res => {
         $('#login').css('display', 'none');
         $('#logout').css('display', 'inline-block');

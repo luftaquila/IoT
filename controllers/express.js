@@ -30,7 +30,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/autologin', (req, res) => {
-  const login_result = Auth.verify(req.body.jwt);
+  const login_result = Auth.verify(req.header('jwt'));
   if(login_result) {
     res.status(201).send(login_result);
     console.log(`[WEBAPI][EVENT] Client autologin: ${req.remoteIP}`);
@@ -43,7 +43,7 @@ app.post('/autologin', (req, res) => {
 
 // device info lookup
 app.get('/device/all', (req, res) => {
-  if(!Auth.verify(req.body.jwt)) res.status(401).send(`authentication failed`);
+  if(!Auth.verify(req.header('jwt'))) res.status(401).send(`authentication failed`);
   else res.status(200).send(JSON.stringify(devices));
   console.log(`[WEBAPI][EVENT] Device lookup: ALL from: ${req.remoteIP} {${res.statusCode}}`);
 });
@@ -63,7 +63,7 @@ app.get('/device/:deviceId', (req, res) => {
 
 // update device status
 app.post('/device/:deviceId', (req, res) => {
-  if(!Auth.verify(req.body.jwt)) res.status(401).send(`authentication failed`);
+  if(!Auth.verify(req.header('jwt'))) res.status(401).send(`authentication failed`);
   else {
     const device = devices.find(device => device.id == req.params.deviceId);
     if(device) {
