@@ -6,11 +6,19 @@ class Device {
   constructor(id, socket) {
     this._id = id;
     this._socket = socket;
+    this._status = {};
+    this._online = true;
   }
 
   get id() { return this._id; }
+
   get socket() { return this._socket; }
   set socket(socket) { this._socket = socket; }
+
+  get status() { return JSON.stringify(this._status); }
+  
+  get online() { return this._online; }
+  set online(online) { this._online = online; }
 }
 
 class PassiveSwitch extends Device {
@@ -19,18 +27,18 @@ class PassiveSwitch extends Device {
     this._type = 0;
 
     // initialize power status
-    this._power = false;
+    this._status.power = false;
     this.sync();
   }
 
   get type() { return this._type; }
-  get power() { return this._power; }
-  set power(power) { this._power = power; }
+  get power() { return this._status.power; }
+  set power(power) { this._status.power = power; }
 
-  toggle() { this._power = !this._power; }
+  toggle() { this._status.power = !this._status.power; }
   sync() {
-    io.to(this._socket).emit('relay', { data: this._power ? '1' : '0' });
-    io.to('client').emit('control-device-sync', { target: this.id, data: this._power });
+    io.to(this._socket).emit('relay', { data: this._status.power ? '1' : '0' });
+    io.to('client').emit('control-device-sync', { target: this.id, data: this._status.power });
   }
 }
 
