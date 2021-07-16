@@ -6,10 +6,11 @@ import devices, { PassiveSwitch } from '../devices/device.js'
 
 dotenv.config();
 
-const io = new Server(process.env.socketPort);
+const io = new Server(process.env.socketPort, { pingInterval: 10000 });
 console.log(`[SOCKET][INFO] Server startup :${process.env.socketPort}`);
 
 io.sockets.on('connection', socket => {
+  const devName = socket.handshake.query.device;
   if(socket.handshake.query.device) {
     socket.join('device');
 
@@ -42,6 +43,10 @@ io.sockets.on('connection', socket => {
       device.sync();
       console.log(`[SOCKET][EVENT] Device control: ${device.id} from: ${socket.handshake.headers['x-forwarded-for']}`);
     }
+  });
+
+  socket.on('disconnect', function () {
+    console.log(devName + ' disconnected')
   });
 });
 
