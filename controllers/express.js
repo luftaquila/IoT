@@ -41,7 +41,13 @@ app.post('/autologin', (req, res) => {
   }
 });
 
-// send device info
+// device info lookup
+app.get('/device/all', (req, res) => {
+  if(!Auth.verify(req.body.jwt)) res.status(401).send(`authentication failed`);
+  else res.status(200).send(JSON.stringify(devices));
+  console.log(`[WEBAPI][EVENT] Device lookup: ALL from: ${req.remoteIP} {${res.statusCode}}`);
+});
+
 app.get('/device/:deviceId', (req, res) => {
   const device = devices.find(device => device.id == req.params.deviceId);
   if(device) {
