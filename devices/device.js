@@ -15,8 +15,9 @@ class Device {
   get socket() { return this._socket; }
   set socket(socket) { this._socket = socket; }
 
-  get status() { return JSON.stringify(this._status); }
-  
+  get status() { return this._status; }
+  get statusJSON() { return JSON.stringify(this._status); }
+
   get online() { return this._online; }
   set online(online) { this._online = online; }
 }
@@ -42,10 +43,30 @@ class PassiveSwitch extends Device {
   }
 }
 
+class LEDDisplay extends Device {
+  constructor(id, socket) {
+    super(id, socket);
+    this._type = 1;
+
+    this._status = {
+      power: true,
+      display: 'READY.',
+      align: 'center'
+    }
+    this.sync();
+  }
+
+  get type() { return this._type; }
+
+  set status(status) {  }
+}
+
 const DeviceType = {
   passiveSwitch: 0,
+  ledDisplay: 1,
 
-  0: 'passiveSwitch'
+  0: 'passiveSwitch',
+  1: 'ledDisplay'
 }
 
 export default devices

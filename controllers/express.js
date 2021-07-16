@@ -21,11 +21,11 @@ app.post('/login', (req, res) => {
   const login_result = Auth.login(req.body.id, req.body.pw);
   if(login_result) {
     res.status(201).send(login_result);
-    console.log(`[WEBAPI][INFO] Client login: ${req.remoteIP}`);
+    console.log(`[WEBAPI][EVENT] Client login: ${req.remoteIP}`);
   }
   else {
     res.status(401).send();
-    console.log(`[WEBAPI][INFO] Client login failure: ${req.remoteIP}`);
+    console.log(`[WEBAPI][EVENT] Client login failure: ${req.remoteIP}`);
   }
 });
 
@@ -33,11 +33,11 @@ app.post('/autologin', (req, res) => {
   const login_result = Auth.verify(req.body.jwt);
   if(login_result) {
     res.status(201).send(login_result);
-    console.log(`[WEBAPI][INFO] Client autologin: ${req.remoteIP}`);
+    console.log(`[WEBAPI][EVENT] Client autologin: ${req.remoteIP}`);
   }
   else {
     res.status(401).send();
-    console.log(`[WEBAPI][INFO] Client autologin failure: ${req.remoteIP}`);
+    console.log(`[WEBAPI][EVENT] Client autologin failure: ${req.remoteIP}`);
   }
 });
 
@@ -51,27 +51,31 @@ app.get('/device/:deviceId', (req, res) => {
         break;
     }
   }
-  else res.status(404).send(`${req.params.deviceId} not found.`);
+  else res.status(404).send(`device ${req.params.deviceId} not found.`);
+  console.log(`[WEBAPI][EVENT] Device lookup: ${req.params.deviceId} from: ${req.remoteIP} {${res.statusCode}}`)
 });
 
 // update device status
 app.post('/device/:deviceId', (req, res) => {
-  if(!Auth.verify(req.body.jwt)) return res.status(401).send();
-  const device = devices.find(device => device.id == req.params.deviceId);
-  if(device) {
-    if(device.online) {
-      switch (DeviceType[device.type]) {
-        case 'passiveSwitch':
-          if(req.body.toggle) device.toggle();
-          else if(req.body.power === 'true' || req.body.power === 'false') device.power = req.body.power;
-          device.sync();
-          break;
+  if(!Auth.verify(req.body.jwt)) res.status(401).send(`authentication failed`);
+  else {
+    const device = devices.find(device => device.id == req.params.deviceId);
+    if(device) {
+      if(device.online) {
+        switch (DeviceType[device.type]) {
+          case 'passiveSwitch':
+            if(req.body.toggle) device.toggle();
+            else if(req.body.power === 'true' || req.body.power === 'false') device.power = req.body.power;
+            device.sync();
+            break;
+        }
+        res.status(201).send({ status: device.status });
       }
-      res.status(201).send();
+      else res.status(503).send(`device ${req.params.deviceId} is offline.`);
     }
-    else res.status(503).send(`device ${req.params.deviceId} is offline.`);
+    else res.status(404).send(`device ${req.params.deviceId} not found.`);
   }
-  else res.status(404).send(`${req.params.deviceId} not found.`);
+  console.log(`[WEBAPI][EVENT] Device control: ${req.params.deviceId} from: ${req.remoteIP} {${res.statusCode}}`);
 });
 
 export default app
