@@ -1,4 +1,5 @@
 import { Server } from 'socket.io'
+import wol from 'node-wol'
 import dotenv from 'dotenv'
 
 import Auth from './auth.js'
@@ -49,6 +50,14 @@ io.sockets.on('connection', socket => {
       device.power = data.power;
       device.sync();
       console.log(`[SOCKET][EVENT] Device control: ${device.id} from: ${socket.handshake.headers['x-forwarded-for']}`);
+    }
+  });
+
+  socket.on('wol', data => {
+    const auth = Auth.verify(data.jwt);
+    if(auth) {
+      wol.wake(process.env.MAC0);
+      console.log(`[SOCKET][EVENT] WOL Request from: ${socket.handshake.headers['x-forwarded-for']}`);
     }
   });
 });

@@ -24,7 +24,7 @@ app.post('/login', (req, res) => {
     console.log(`[WEBAPI][EVENT] Client login: ${req.body.id}(${req.remoteIP})`);
   }
   else {
-    res.status(401).send();
+    res.status(401).send(`authentication failed`);
     console.log(`[WEBAPI][EVENT] Client login failure: ${req.remoteIP}`);
   }
 });
@@ -36,8 +36,22 @@ app.post('/autologin', (req, res) => {
     console.log(`[WEBAPI][EVENT] Client autologin: ${login_result.id}(${req.remoteIP})`);
   }
   else {
-    res.status(401).send();
+    res.status(401).send(`authentication failed`);
     console.log(`[WEBAPI][EVENT] Client autologin failure: ${req.remoteIP}`);
+  }
+});
+
+// WOL Request
+app.post('/wol', (req, res) => {
+  const login_result = Auth.verify(req.header('jwt'));
+  if(login_result) {
+    wol.wake(process.env.MAC0);
+    res.status(201).send(`WOL signal sent`);
+    console.log(`[WEBAPI][EVENT] WOL Request from: ${req.remoteIP} {${res.statusCode}}`);
+  }
+  else {
+    res.status(401).send(`authentication failed`);
+    console.log(`[WEBAPI][EVENT] WOL Request auth failed from: ${req.remoteIP} {${res.statusCode}}`);
   }
 });
 
