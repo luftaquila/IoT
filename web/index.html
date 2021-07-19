@@ -71,42 +71,13 @@
         <div class="page-heading">
           <h3>
             Quick Control
-            <div id='socket' style="border-radius: 50%; border: 1px solid green; width: 1rem; height: 1rem; display: inline-block;">&nbsp;</div>
+            <div id='socket-indicator' class='indicator'>&nbsp;</div>
           </h3>
         </div>
         <div class="page-content">
           <section class="row">
             <div class="col-12 col-lg-9">
-              <div class="row" style="align-items: center">
-                <div class="col-6 col-lg-3 col-md-6">
-                  <div class="card">
-                    <label class="form-check-label" for="lightSwitch0">
-                      <div class="card-body px-3 py-3">
-                        <div class="row" style="align-items: center">
-                          <div class="col-md-4">
-                            <div class="form-check form-switch"><input class="form-check-input control-passive-switch" type="checkbox" id="lightSwitch0" disabled></div>
-                          </div>
-                          <div class="col-md-8 switch-card">Computer Room</div>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-                <div class="col-6 col-lg-3 col-md-6">
-                  <div class="card">
-                    <label class="form-check-label" for="lightSwitch1">
-                      <div class="card-body px-3 py-3">
-                        <div class="row" style="align-items: center">
-                          <div class="col-md-4">
-                            <div class="form-check form-switch"><input class="form-check-input control-passive-switch" type="checkbox" id="lightSwitch1" disabled></div>
-                          </div>
-                          <div class="col-md-8 switch-card">Bed Room</div>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
+              <div id='quick-control' class="row" style="align-items: center"></div>
             </div>
           </section>
         </div>
@@ -166,7 +137,6 @@
     <script src="assets/js/js.cookie.min.js"></script>
 
     <script src="assets/js/script.js"></script>
-    <script>socketListener()</script>
 </body>
 
 </html>

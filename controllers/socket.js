@@ -7,7 +7,7 @@ import devices, { PassiveSwitch, DeviceType } from '../devices/device.js'
 
 dotenv.config();
 
-const io = new Server(process.env.socketPort, { pingInterval: 10000 });
+const io = new Server(process.env.socketPort);
 console.log(`[SOCKET][INFO] Server startup :${process.env.socketPort}`);
 
 io.sockets.on('connection', socket => {
@@ -17,8 +17,16 @@ io.sockets.on('connection', socket => {
     // register device
     let device = devices.find(x => x.id == socket.handshake.query.device);
     if(device) { // if deviceId is seen before
-      device.socket = socket.id;
-      device.online = true;
+      io.to(device.socket).disconnectSockets(); // disconnect previous known socket
+      device.socket = socket.id; // update socket id
+      device.online = true; // set online
+
+      // initialize status
+      switch (DeviceType[device.type]) {
+        case 'passiveSwitch':
+          device.power = false;
+          break;
+      }
     }
     else { // if deviceId is new
       switch (socket.handshake.query.deviceType) {
@@ -28,18 +36,18 @@ io.sockets.on('connection', socket => {
       }
       devices.push(device);
     }
-    console.log(`[SOCKET][INFO] Device connected: ${device.id}(${DeviceType[device.type]})`);
+    console.log(`[SOCKET][EVENT] Device connected: ${device.id}(${DeviceType[device.type]})`);
 
     socket.on('disconnect', () => {
       device.online = false;
-      console.log(`[SOCKET][INFO] Device disconnected: ${device.id}(${DeviceType[device.type]})`);
+      console.log(`[SOCKET][EVENT] Device disconnected: ${device.id}(${DeviceType[device.type]})`);
     });
   }
 
   else if(socket.handshake.query.client) {
     socket.join('client');
-    socket.emit('client-init', devices);
-    console.log(`[SOCKET][INFO] Client connected: ${socket.handshake.headers['x-forwarded-for']}`);
+    socket.emit('client-init', devices.map(x => { return { id: x.id, status: x.status, online: x.online }}));
+    console.log(`[SOCKET][EVENT] Client connected: ${socket.handshake.headers['x-forwarded-for']}`);
   }
 
   //!--------------------------- socket events -------------------------------

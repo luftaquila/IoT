@@ -1,18 +1,21 @@
 const access = {
   _login: false,
   _socket: false,
+
   check() { return this._login && this._socket; },
   set login(status) {
     this._login = status;
-    $('.control-passive-switch').attr('disabled', !this.check());
+    $('.control').attr('disabled', !this.check());
    },
   set socket(status) {
     this._socket = status;
-    $('#socket').css('background-color', this._socket ? 'green' : '');
-    $('.control-passive-switch').attr('disabled', !this.check());
+    if(this._socket) $('#socket-indicator').addClass('indicator-on');
+    else $('#socket-indicator').removeClass('indicator-on');
+    $('.control').attr('disabled', !this.check());
    }
 }
 
+$(loadDevices);
 $(autoLoginProcess);
 
 function autoLoginProcess() {
@@ -43,11 +46,58 @@ function autoLoginProcess() {
   }
 }
 
+async function loadDevices() {
+  const devices_list = await $.ajax('/devices.json');
+  access.devices = new Map(devices_list.map(x => [x.id, {
+    id: x.id,
+    type: x.type,
+    name: x.name,
+    width: x.width,
+    height: x.height,
+    _online: false,
+    _status: null,
+
+    set online(status) {
+      this._online = status;
+
+      $(`#${this.id}-container input`).attr('disabled', !this._online);
+      if(this._online) $(`#${this.id}-indicator`).addClass('indicator-on');
+      else $(`#${this.id}-indicator`).removeClass('indicator-on');
+    },
+    set status(status) {
+      this._status = status;
+      switch (this.type) {
+        case 'passiveSwitch':
+          $(`#${this.id}`).prop('checked', this._status.power);
+          break;
+      }
+    }
+  }]));
+
+  // render interfaces
+  for(const device of access.devices.values()) {
+    try {
+      let html = await $.ajax(`devices/${device.type}.html`);
+      html = html.replace(/##name##/g, device.name).replace(/##id##/g, device.id).replace(/##width##/g, device.width * 6).replace(/##width-large##/g, device.width * 4).replace(/##width##/g, device.width * 6).replace(/##height##/g, device.height * 4.5);
+      $('#quick-control').append(html);
+    }
+    catch(e) { continue; }
+  }
+
+  socketListener();
+}
+
 function socketListener() {
   socket = io({ query: { client: true } });
   socket.on('client-init', devices => {
-    devices.forEach(device => $(`#${device._id}`).prop('checked', device._power) );
     access.socket = true;
+
+    // sync device status
+    devices.forEach(device => {
+      access.devices.get(device.id).online = device.online;
+      access.devices.get(device.id).status = device.status;
+    });
+    
     eventListener();
   });
 
@@ -56,7 +106,7 @@ function socketListener() {
 }
 
 function eventListener() {
-  $('.control-passive-switch').change(function() {
+  $('.control').change(function() {
     socket.emit('control-device', {
       target: $(this).attr('id'),
       power: $(this).prop('checked'),
