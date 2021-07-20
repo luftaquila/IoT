@@ -60,8 +60,7 @@ async function loadDevices() {
 
     set online(status) {
       this._online = status;
-
-      $(`#${this.id}-container input`).attr('disabled', !this._online && !access.check());
+      $(`#${this.id}-container input`).attr('disabled', !(this._online && access.check()));
       if(this._online) $(`#${this.id}-indicator`).addClass('indicator-on');
       else $(`#${this.id}-indicator`).removeClass('indicator-on');
     },
@@ -127,6 +126,17 @@ function eventListener() {
         break;
     }
     socket.emit('device-control', payload);
+  });
+
+  $('.control-container > div').click(function() {
+    if($(this).find('input').is(':disabled')) return Toastify({
+        text: "권한이 없습니다.&ensp;",
+        duration: 3000,
+        close: true,
+        gravity: "bottom",
+        position: "right",
+        backgroundColor: "#f3616d",
+    }).showToast();
   });
 }
 
