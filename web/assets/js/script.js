@@ -54,13 +54,14 @@ async function loadDevices() {
     name: x.name,
     width: x.width,
     height: x.height,
+    indicator: x.indicator,
     _online: false,
     _status: null,
 
     set online(status) {
       this._online = status;
 
-      $(`#${this.id}-container input`).attr('disabled', !this._online);
+      $(`#${this.id}-container input`).attr('disabled', !this._online && !access.check());
       if(this._online) $(`#${this.id}-indicator`).addClass('indicator-on');
       else $(`#${this.id}-indicator`).removeClass('indicator-on');
     },

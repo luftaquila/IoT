@@ -36,11 +36,11 @@ io.sockets.on('connection', socket => {
       }
       devices.push(device);
     }
-    console.log(`[SOCKET][EVENT] Device connected: ${device.id}(${DeviceType[device.type]})`);
+    console.log(`[SOCKET][EVENT] ${new Date()} Device connected: ${device.id}(${DeviceType[device.type]})`);
 
     socket.on('disconnect', () => {
       device.online = false;
-      console.log(`[SOCKET][EVENT] Device disconnected: ${device.id}(${DeviceType[device.type]})`);
+      console.log(`[SOCKET][EVENT] ${new Date()} Device disconnected: ${device.id}(${DeviceType[device.type]})`);
     });
   }
 

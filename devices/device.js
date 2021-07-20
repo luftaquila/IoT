@@ -22,7 +22,7 @@ class Device {
   get online() { return this._online; }
   set online(online) {
     this._online = online;
-    io.to('client').emit('device-network-sync', { id: this.id, online: online });
+    io.to('client').emit('device-network-sync', { id: this.id, online: online, status: this.status });
   }
 }
 
