@@ -18,6 +18,21 @@
   justify-content: center;
 }
 
+.form-push-input {
+  margin-left: -2.5em;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.form-push-input:disabled { color: lightgray; }
+.form-push-input:before {
+  content: "\f011";
+  font-family: "Font Awesome 5 Pro";
+  font-weight: 900;
+  font-size: 2rem;
+}
+
 .switch-card {
   display: flex;
   justify-content: center;

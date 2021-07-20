@@ -3,18 +3,21 @@
     "id":"lightSwitch0",
     "type":"passiveSwitch",
     "name":"Computer Room Light",
+    "indicator":"1",
     "width":"1",
     "height":"1"
   }, {
     "id":"lightSwitch1",
     "type":"passiveSwitch",
     "name":"Bedroom Light",
+    "indicator":"1",
     "width":"1",
     "height":"1"
   }, {
     "id":"wakeonlan0",
     "type":"passiveTactSwitch",
     "name":"Main Desktop",
+    "indicator":"0",
     "width":"1",
     "height":"1"
   }

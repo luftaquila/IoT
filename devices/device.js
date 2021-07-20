@@ -32,7 +32,7 @@ class PassiveSwitch extends Device {
     this._type = 0;
 
     // initialize power status
-    this.power = false;
+    this._status.power = false;
     this.sync();
   }
 
@@ -42,15 +42,28 @@ class PassiveSwitch extends Device {
 
   toggle() { this.power = !this.power; }
   sync() {
-    io.to(this._socket).emit('relay', { data: this.power ? '1' : '0' });
+    io.to(this.socket).emit('relay', { data: this.power ? '1' : '0' });
     io.to('client').emit('device-control-sync', { target: this.id, data: this.power });
+  }
+}
+
+class PassiveTactSwitch extends Device {
+  constructor(id, socket) {
+    super(id, socket);
+    this._type = 1;
+  }
+
+  get type() { return this._type; }
+  push() {
+    io.to(this.socket).emit('push');
+    io.to('client').emit('device-control-sync', { target: this.id, data: true });
   }
 }
 
 class LEDDisplay extends Device {
   constructor(id, socket) {
     super(id, socket);
-    this._type = 1;
+    this._type = 2;
 
     this._status = {
       power: true,
@@ -67,10 +80,10 @@ class LEDDisplay extends Device {
 
 const DeviceType = {
   passiveSwitch: 0,
-  ledDisplay: 1,
+  ledDisplay: 2,
 
   0: 'passiveSwitch',
-  1: 'ledDisplay'
+  2: 'ledDisplay'
 }
 
 export default devices

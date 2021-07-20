@@ -78,7 +78,7 @@ async function loadDevices() {
   for(const device of access.devices.values()) {
     try {
       let html = await $.ajax(`devices/${device.type}.html`);
-      html = html.replace(/##name##/g, device.name).replace(/##id##/g, device.id).replace(/##width##/g, device.width * 6).replace(/##width-large##/g, device.width * 4).replace(/##width##/g, device.width * 6).replace(/##height##/g, device.height * 4.5);
+      html = html.replace(/##name##/g, device.name).replace(/##id##/g, device.id).replace(/##width##/g, device.width * 6).replace(/##width-large##/g, device.width * 4).replace(/##width##/g, device.width * 6).replace(/##height##/g, device.height * 4.5).replace(/##indicator##/g, device.indicator * 1 ? 'inline-block' : 'none');
       $('#quick-control').append(html);
     }
     catch(e) { continue; }
@@ -109,12 +109,24 @@ function socketListener() {
 }
 
 function eventListener() {
-  $('.control').change(function() {
-    socket.emit('device-control', {
-      target: $(this).attr('id'),
-      power: $(this).prop('checked'),
-      jwt: Cookies.get('JWT')
-    });
+  $('.control').click(function() {
+    // !! per device type control required
+    const deviceType = $(this).attr('class').split(' ').filter(x => x.includes('device-'))[0].replace('device-', '');
+    console.log(deviceType);
+
+    switch (deviceType) {
+      case 'passiveSwitch':
+        socket.emit('device-control', {
+          target: $(this).attr('id'),
+          power: $(this).prop('checked'),
+          jwt: Cookies.get('JWT')
+        });
+        break;
+
+      case 'passiveTactSwitch':
+
+        break;
+    }
   });
 }
 
