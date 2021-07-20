@@ -15,7 +15,7 @@ io.sockets.on('connection', socket => {
     socket.join('device');
 
     // register device
-    let device = devices.find(x => x.id == socket.handshake.query.device);
+    let device = devices.get(socket.handshake.query.device);
     if(device) { // if deviceId is seen before
       io.to(device.socket).disconnectSockets(); // disconnect previous known socket
       device.socket = socket.id; // update socket id
@@ -34,38 +34,38 @@ io.sockets.on('connection', socket => {
           device = new PassiveSwitch(socket.handshake.query.device, socket.id);
           break;
       }
-      devices.push(device);
+      devices.set(socket.handshake.query.device, device);
     }
-    console.log(`[SOCKET][EVENT] ${new Date()} Device connected: ${device.id}(${DeviceType[device.type]})`);
+    console.log(`[SOCKET][EVENT] Device connected: ${device.id}(${DeviceType[device.type]})`);
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', reason => {
       device.online = false;
-      console.log(`[SOCKET][EVENT] ${new Date()} Device disconnected: ${device.id}(${DeviceType[device.type]})`);
+      console.log(`[SOCKET][EVENT] Device disconnected: ${device.id}(${DeviceType[device.type]})`);
     });
   }
 
   else if(socket.handshake.query.client) {
     socket.join('client');
-    socket.emit('client-init', devices.map(x => { return { id: x.id, status: x.status, online: x.online }}));
+    socket.emit('client-init', Array.from(devices.values()).map(x => x.info) );
     console.log(`[SOCKET][EVENT] Client connected: ${socket.handshake.headers['x-forwarded-for']}`);
   }
 
   //!--------------------------- socket events -------------------------------
   socket.on('device-control', data => {
     const auth = Auth.verify(data.jwt);
-    const device = devices.find(device => device.id == data.target);
+    const device = devices.get(data.target);
     if(auth && device) {
-      device.power = data.power;
-      device.sync();
-      console.log(`[SOCKET][EVENT] Device control: ${device.id} from: ${socket.handshake.headers['x-forwarded-for']}`);
-    }
-  });
+      switch (DeviceType[device.type]) {
+        case 'passiveSwitch':
+          device.power = data.power;
+          device.sync();
+          break;
 
-  socket.on('wol', data => {
-    const auth = Auth.verify(data.jwt);
-    if(auth) {
-      wol.wake(process.env.MAC0);
-      console.log(`[SOCKET][EVENT] WOL Request from: ${socket.handshake.headers['x-forwarded-for']}`);
+        case 'PassiveTactSwitch':
+          if(device.id == 'wakeonlan0') wol.wake(process.env.MAC0, error => { if(error) return; });
+          break;
+      }
+      console.log(`[SOCKET][EVENT] Device control: ${device.id} from: ${socket.handshake.headers['x-forwarded-for']}`);
     }
   });
 });

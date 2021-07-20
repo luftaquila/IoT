@@ -10,7 +10,7 @@ const access = {
   set socket(status) {
     this._socket = status;
     if(this._socket) $('#socket-indicator').addClass('indicator-on');
-    else $('#socket-indicator').removeClass('indicator-on');
+    else $('.indicator').removeClass('indicator-on');
     $('.control').attr('disabled', !this.check());
    }
 }
@@ -98,8 +98,6 @@ function socketListener() {
       access.devices.get(device.id).online = device.online;
       access.devices.get(device.id).status = device.status;
     });
-
-    eventListener();
   });
 
   // !! per device type control required
@@ -107,27 +105,28 @@ function socketListener() {
 
   socket.on('device-network-sync', data => { access.devices.get(data.id).online = data.online; });
   socket.on('disconnect', () => access.socket = false );
+
+  eventListener();
 }
 
 function eventListener() {
   $('.control').click(function() {
     // !! per device type control required
     const deviceType = $(this).attr('class').split(' ').filter(x => x.includes('device-'))[0].replace('device-', '');
-    console.log(deviceType);
 
+    let payload = {
+      target: $(this).attr('id'),
+      jwt: Cookies.get('JWT')
+    };
     switch (deviceType) {
       case 'passiveSwitch':
-        socket.emit('device-control', {
-          target: $(this).attr('id'),
-          power: $(this).prop('checked'),
-          jwt: Cookies.get('JWT')
-        });
+        payload.power = $(this).prop('checked');
         break;
 
       case 'passiveTactSwitch':
-
         break;
     }
+    socket.emit('device-control', payload);
   });
 }
 

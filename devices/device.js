@@ -1,6 +1,6 @@
 import io from '../controllers/socket.js'
 
-let devices = [];
+let devices = new Map();
 
 class Device {
   constructor(id, socket) {
@@ -8,7 +8,7 @@ class Device {
     this._socket = socket;
     this._status = {};
     this._online = true;
-    io.to('client').emit('device-network-sync', { id: id, online: true });
+    if(socket) io.to('client').emit('device-network-sync', { id: id, online: true });
   }
 
   get id() { return this._id; }
@@ -23,6 +23,14 @@ class Device {
   set online(online) {
     this._online = online;
     io.to('client').emit('device-network-sync', { id: this.id, online: online, status: this.status });
+  }
+
+  get info() {
+    return {
+      id: this.id,
+      status: this.status,
+      online: this.online
+    }
   }
 }
 
@@ -80,11 +88,16 @@ class LEDDisplay extends Device {
 
 const DeviceType = {
   passiveSwitch: 0,
+  PassiveTactSwitch: 1,
   ledDisplay: 2,
 
   0: 'passiveSwitch',
+  1: 'PassiveTactSwitch',
   2: 'ledDisplay'
 }
+
+// set virtual devices
+devices.set('wakeonlan0', new PassiveTactSwitch('wakeonlan0', null));
 
 export default devices
 export { PassiveSwitch, DeviceType }
