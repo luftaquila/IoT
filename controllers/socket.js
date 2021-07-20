@@ -51,7 +51,7 @@ io.sockets.on('connection', socket => {
   }
 
   //!--------------------------- socket events -------------------------------
-  socket.on('control-device', data => {
+  socket.on('device-control', data => {
     const auth = Auth.verify(data.jwt);
     const device = devices.find(device => device.id == data.target);
     if(auth && device) {

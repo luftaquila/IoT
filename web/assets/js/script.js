@@ -97,17 +97,20 @@ function socketListener() {
       access.devices.get(device.id).online = device.online;
       access.devices.get(device.id).status = device.status;
     });
-    
+
     eventListener();
   });
 
-  socket.on('control-device-sync', data => $(`#${data.target}`).prop('checked', data.data) );
+  // !! per device type control required
+  socket.on('device-control-sync', data => $(`#${data.target}`).prop('checked', data.data) );
+
+  socket.on('device-network-sync', data => { access.devices.get(data.id).online = data.online; });
   socket.on('disconnect', () => access.socket = false );
 }
 
 function eventListener() {
   $('.control').change(function() {
-    socket.emit('control-device', {
+    socket.emit('device-control', {
       target: $(this).attr('id'),
       power: $(this).prop('checked'),
       jwt: Cookies.get('JWT')
