@@ -41,36 +41,16 @@ app.post('/autologin', (req, res) => {
   }
 });
 
-// WOL Request
-app.post('/wol', (req, res) => {
-  const login_result = Auth.verify(req.header('jwt'));
-  if(login_result) {
-    wol.wake(process.env.MAC0);
-    res.status(201).send(`WOL signal sent`);
-    console.log(`[WEBAPI][EVENT] WOL Request from: ${req.remoteIP} {${res.statusCode}}`);
-  }
-  else {
-    res.status(401).send(`authentication failed`);
-    console.log(`[WEBAPI][EVENT] WOL Request auth failed from: ${req.remoteIP} {${res.statusCode}}`);
-  }
-});
-
 // device info lookup
 app.get('/device/all', (req, res) => {
   if(!Auth.verify(req.header('jwt'))) res.status(401).send(`authentication failed`);
-  else res.status(200).send(JSON.stringify(devices));
+  else res.status(200).send(Array.from(devices.values()).map(x => x.info));
   console.log(`[WEBAPI][EVENT] Device lookup: ALL from: ${req.remoteIP} {${res.statusCode}}`);
 });
 
 app.get('/device/:deviceId', (req, res) => {
-  const device = devices.find(device => device.id == req.params.deviceId);
-  if(device) {
-    switch (DeviceType[device.type]) {
-      case 'passiveSwitch':
-        res.status(200).send({ online: device.online, status: device.status });
-        break;
-    }
-  }
+  const device = devices.get(req.params.deviceId);
+  if(device) res.status(200).send(device.info);
   else res.status(404).send(`device ${req.params.deviceId} not found.`);
   console.log(`[WEBAPI][EVENT] Device lookup: ${req.params.deviceId} from: ${req.remoteIP} {${res.statusCode}}`)
 });
@@ -79,14 +59,20 @@ app.get('/device/:deviceId', (req, res) => {
 app.post('/device/:deviceId', (req, res) => {
   if(!Auth.verify(req.header('jwt'))) res.status(401).send(`authentication failed`);
   else {
-    const device = devices.find(device => device.id == req.params.deviceId);
+    const device = devices.get(req.params.deviceId);
     if(device) {
       if(device.online) {
         switch (DeviceType[device.type]) {
           case 'passiveSwitch':
             if(req.body.toggle) device.toggle();
             else if(req.body.power === 'true' || req.body.power === 'false') device.power = req.body.power;
+            else return res.status(400).send(`Invalid request parameters`);
             device.sync();
+            break;
+
+          case 'passiveTactSwitch':
+            if(req.body.push) device.push();
+            else return res.status(400).send(`Invalid request parameters`);
             break;
         }
         res.status(201).send({ status: device.status });
