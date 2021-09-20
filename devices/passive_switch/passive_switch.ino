@@ -10,6 +10,13 @@
 
 #include <Hash.h>
 
+
+String DEVICEID = "deviceid";
+
+char WIFIAP[20] = "SSID";
+char WIFIPW[20] = "PW";
+
+
 ESP8266WiFiMulti WiFiMulti;
 SocketIOclient socketIO;
 bool isFirstConnect = true;
@@ -69,7 +76,7 @@ void setup() {
   // disable AP
   if(WiFi.getMode() & WIFI_AP) WiFi.softAPdisconnect(true);
 
-  WiFiMulti.addAP("LUFT-AQUILA", "rokaFWIf512#");
+  WiFiMulti.addAP(WIFIAP, WIFIPW);
 
   //WiFi.disconnect();
   while(WiFiMulti.run() != WL_CONNECTED) delay(100);
@@ -78,7 +85,7 @@ void setup() {
   Serial.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
 
   // server address, port and URL
-  socketIO.begin("iot.luftaquila.io", 3150, "/socket.io/?EIO=4&device=lightSwitch0&deviceType=passiveSwitch");
+  socketIO.begin("iot.luftaquila.io", 3150, "/socket.io/?EIO=4&device=" + DEVICEID + "&deviceType=passiveSwitch");
 
   // event handler
   socketIO.onEvent(socketIOEvent);
