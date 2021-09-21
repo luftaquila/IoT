@@ -4,11 +4,12 @@ import dotenv from 'dotenv'
 
 import Auth from './auth.js'
 import devices, { PassiveSwitch, DeviceType } from '../devices/device.js'
+import logger from './logger.js'
 
 dotenv.config();
 
 const io = new Server(process.env.socketPort);
-console.log(`[SOCKET][INFO] Server startup :${process.env.socketPort}`);
+logger('SOCKET', 'INFO', `Server startup :${process.env.socketPort}`);
 
 io.sockets.on('connection', socket => {
   if(socket.handshake.query.device) {
@@ -36,18 +37,18 @@ io.sockets.on('connection', socket => {
       }
       devices.set(socket.handshake.query.device, device);
     }
-    console.log(`[SOCKET][EVENT] Device connected: ${device.id}(${DeviceType[device.type]})`);
+    logger('SOCKET', 'INFO', `Device connected: ${device.id}(${DeviceType[device.type]})`);
 
     socket.on('disconnect', reason => {
       device.online = false;
-      console.log(`[SOCKET][EVENT] Device disconnected: ${device.id}(${DeviceType[device.type]})`);
+      logger('SOCKET', 'INFO', `Device disconnected: ${device.id}(${DeviceType[device.type]})`);
     });
   }
 
   else if(socket.handshake.query.client) {
     socket.join('client');
     socket.emit('client-init', Array.from(devices.values()).map(x => x.info) );
-    console.log(`[SOCKET][EVENT] Client connected: ${socket.handshake.headers['x-forwarded-for']}`);
+    logger('SOCKET', 'INFO', `Client connected: ${socket.handshake.headers['x-forwarded-for']}`);
   }
 
   //!--------------------------- socket events -------------------------------
@@ -65,7 +66,7 @@ io.sockets.on('connection', socket => {
           if(device.id == 'wakeonlan0') wol.wake(process.env.MAC0, error => { if(error) return; });
           break;
       }
-      console.log(`[SOCKET][EVENT] Device control: ${device.id} from: ${socket.handshake.headers['x-forwarded-for']}`);
+      logger('SOCKET', 'INFO', `Device control: ${device.id} from: ${socket.handshake.headers['x-forwarded-for']}`);
     }
   });
 });

@@ -92,7 +92,7 @@ const DeviceType = {
   ledDisplay: 2,
 
   0: 'passiveSwitch',
-  1: 'PassiveTactSwitch',
+  1: 'passiveTactSwitch',
   2: 'ledDisplay'
 }
 
