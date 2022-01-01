@@ -1,4 +1,4 @@
-import io from '../controllers/socket.js'
+import io from '../controllers/socket.mjs'
 
 let devices = new Map();
 
@@ -98,6 +98,7 @@ const DeviceType = {
 
 // set virtual devices
 devices.set('wakeonlan0', new PassiveTactSwitch('wakeonlan0', null));
+devices.set('sleeponlan0', new PassiveTactSwitch('sleeponlan0', null));
 
 export default devices
 export { PassiveSwitch, DeviceType }

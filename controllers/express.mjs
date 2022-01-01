@@ -3,9 +3,9 @@ import wol from 'node-wol'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
 
-import Auth from './auth.js'
-import devices, { DeviceType } from '../devices/device.js'
-import logger from './logger.js'
+import Auth from './auth.mjs'
+import devices, { DeviceType } from '../devices/device.mjs'
+import logger from './logger.mjs'
 
 dotenv.config();
 

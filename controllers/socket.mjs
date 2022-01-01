@@ -1,10 +1,11 @@
 import { Server } from 'socket.io'
+import axios from 'axios'
 import wol from 'node-wol'
 import dotenv from 'dotenv'
 
-import Auth from './auth.js'
-import devices, { PassiveSwitch, DeviceType } from '../devices/device.js'
-import logger from './logger.js'
+import Auth from './auth.mjs'
+import devices, { PassiveSwitch, DeviceType } from '../devices/device.mjs'
+import logger from './logger.mjs'
 
 dotenv.config();
 
@@ -62,8 +63,9 @@ io.sockets.on('connection', socket => {
           device.sync();
           break;
 
-        case 'PassiveTactSwitch':
+        case 'passiveTactSwitch':
           if(device.id == 'wakeonlan0') wol.wake(process.env.MAC0, error => { if(error) return; });
+          if(device.id == 'sleeponlan0') axios.get(process.env.sleeponlan0URI);
           break;
       }
       logger('SOCKET', 'INFO', `Device control: ${device.id} from: ${socket.handshake.headers['x-forwarded-for']}`);
